@@ -1,0 +1,495 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>WebGL Texturing</title>
+</head>
+<body>
+	<canvas width="500" height="500" id="webgl-canvas"></canvas>
+
+    <script src="../common/webgl-debug.js"></script>
+    <script src="../common/webgl-lint.js"></script>
+    <script src="../common/math.js"></script>
+    <script src="../common/gl-utils.js"></script>
+    <script src="../common/input.js"></script>
+    <script src="../common/renderloop.js"></script>
+    <script src="../common/camera.js"></script>
+    <script src="../common/grid.js"></script>
+    <script src="../common/dat.gui.min.js"></script>
+    <script src="../common/stats.min.js"></script>
+    <script src="../common/objparser.js"></script>
+
+    <script src="renderer.js"></script>
+    <script src="modeltransform.js"></script>
+    <script src="primitives.js"></script>
+
+    <script type="text/javascript">
+        "use strict"; // use strict javascript compiling
+
+        //--------------------------------------------------
+        // Global Cashes
+        //--------------------------------------------------
+        var MeshCache = {}; // here all mesh objects are stored, see GLUtils.createMesh() for details on how a mesh is added.
+        var TextureCache = {}; // here all texture objects are stored, see GLUtils.loadTexture() for details on how a texture is added.
+
+        // -----------------------------------------
+        // Global variables
+        // -----------------------------------------
+        var gl;
+        var canvas;
+        var renderLoop;
+
+        var g_camera;
+        var g_cameraController;
+
+        var ground, dock;
+
+        var house1, house2, house3, house4, house5, house6;
+        var roof1, roof2, roof3, roof4, roof5, roof6;
+        var sideRoof6a, sideRoof6b, sideRoof1a, sideRoof1b, sideRoof3;
+        var roofWindow1, roofWindow2, roofWindow3, roofWindow3_1, roofWindow3_2, roofWindow4, roofWindow5, 
+        roofWindow6, roofWindow7, roofWindow8, roofWindow9;
+        var chimney1, chimney2;
+
+        var umbrella1, umbrella1b, umbrella2, umbrella3, umbrella4, umbrella5, umbrella6, umbrella7;
+        var pole1, pole1b, pole2, pole3, pole4, pole5, pole6, pole7;
+
+        var g_grid;
+
+        var g_renderer;
+
+        // lighting
+        var g_lightingData = {
+            directionalLight: new V3(-0.2, -0.5, -0.5).normalize(), // light direction
+            directionalColor: new V3(1.0, 1.0, 1.0), // light color by default white
+            ambientColor: new V3(0.2, 0.2, 0.2) // dark gray
+        }
+
+        // This will execute the setup function once the whole document has been loaded.
+        window.addEventListener("load",function(){
+            setup();
+        });
+
+        function setup(){
+            canvas = document.getElementById("webgl-canvas");
+            gl = GLUtils.createWebGLInstance(canvas, true, true); // fullscreen = true, debugging = true
+            gl.clearColor(0.85, 0.95, 0.9, 1); // set clear color (RGBA)
+            gl.fitScreen();
+            gl.enable(gl.DEPTH_TEST);
+            gl.depthFunc(gl.LEQUAL);
+
+            // our shader files are loaded here. Once completed, init is called
+            // for now there is only the standardShader, but you can add more by
+            // simply adding another path into the array shaderPaths.
+            let shaderPaths = ["shaders/standardShader.glsl"];
+            GLUtils.loadShaders(shaderPaths, init);
+        }
+
+        function init(){
+            Input.initialize(canvas);
+
+            g_renderer = new Renderer("standardShader");
+
+            g_camera = new PerspectiveCamera(45, 0.1, 1000, canvas.width / canvas.height);
+            g_cameraController = new OrbiterCameraController(canvas, g_camera);
+            g_cameraController.target.set(0,0,0);
+
+            //TODO DONE: load texture from ressources folder to TextureCache
+             //TODO DONE: add mainTexture property with loaded texture to material
+
+            //LOADED TEXTURES
+            GLUtils.loadTexture("uv-test", "ressources/uv-test.png"); 
+            GLUtils.loadTexture("wood_texture", "ressources/wood_texture.png"); 
+            GLUtils.loadTexture("grass_texture", "ressources/grass_texture.png"); 
+            GLUtils.loadTexture("brick_texture", "ressources/brick_texture.png"); 
+            GLUtils.loadTexture("tile_texture", "ressources/tile_texture.png"); 
+            GLUtils.loadTexture("leather_texture", "ressources/leather_texture.png"); 
+    
+
+            //ALL MATERIALS
+            // let uvTestMat = {tint: new V3(1, 1, 1), mainTexture: "uv-test"}; 
+            // let woodTexture = {tint: new V3(1, 1, 1), mainTexture: "wood_texture"}; 
+            // let grassTexture = {tint: new V3(1, 1, 1), mainTexture: "grass_texture"}; 
+            // let brickTexture = {tint: new V3(1, 1, 1), mainTexture: "brick_texture"}; 
+            // let tileTexture = {tint: new V3(1, 1, 1), mainTexture: "tile_texture"}; 
+            // let leatherTexture = {tint: new V3(1, 1, 1), mainTexture: "leather_texture"}; 
+
+            let uvTestMat = {tint: new V3(1, 1, 1),
+                shininess : 10, specularIntensity: 0.2,
+                mainTexture: "uv-test"}; 
+            let woodTexture = {tint: new V3(1, 1, 1), 
+                shininess : 10, specularIntensity: 0.8,
+                mainTexture: "wood_texture"}; 
+            let grassTexture = {tint: new V3(1, 1, 1),
+                shininess : 10, specularIntensity: 0.2,
+                mainTexture: "grass_texture"}; 
+            let brickTexture = {tint: new V3(1, 1, 1),
+                shininess : 10, specularIntensity: 0.8,
+                mainTexture: "brick_texture"}; 
+            let tileTexture = {tint: new V3(1, 1, 1),
+                shininess : 10, specularIntensity: 0.2,
+                mainTexture: "tile_texture"}; 
+            let leatherTexture = {tint: new V3(1, 1, 1),
+                shininess : 10, specularIntensity: 0.2,
+                mainTexture: "leather_texture"}; 
+
+    
+            //LOAD MESHES 
+            let monkeyMesh = OBJLoader.getMesh("monkey", "ressources/monkeyhead.obj");
+            //let humanMesh = OBJLoader.getMesh("human", "ressources/human.obj"); 
+           
+
+            //MODEL TRANSFORMS
+            ground = new ModelTransform(Primitives.Quad.getMesh(), grassTexture);
+            dock = new ModelTransform(Primitives.Cube.getMesh(), woodTexture);
+
+            //triangularPrism = new ModelTransform(Primitives.Triangularprism.getMesh(), grassMat); 
+
+            house1 = new ModelTransform(Primitives.Cube.getMesh(), brickTexture);
+            house2 = new ModelTransform(Primitives.Cube.getMesh(), brickTexture);
+            house3 = new ModelTransform(Primitives.Cube.getMesh(), brickTexture);
+            house4 = new ModelTransform(Primitives.Cube.getMesh(), brickTexture);
+            house5 = new ModelTransform(Primitives.Cube.getMesh(), brickTexture);
+            house6 = new ModelTransform(Primitives.Cube.getMesh(), brickTexture);
+            
+            roof1 = new ModelTransform(Primitives.TriangularPrism.getMesh(), woodTexture);
+            roof2 = new ModelTransform(Primitives.TriangularPrism.getMesh(), woodTexture);
+            roof3 = new ModelTransform(Primitives.TriangularPrism.getMesh(), woodTexture);
+            roof4 = new ModelTransform(Primitives.TriangularPrism.getMesh(), woodTexture);
+            roof5 = new ModelTransform(Primitives.TriangularPrism.getMesh(), woodTexture);
+            roof6 = new ModelTransform(Primitives.TriangularPrism.getMesh(), woodTexture);
+
+            sideRoof1a = new ModelTransform(Primitives.Cube.getMesh(), brickTexture);
+            sideRoof1b = new ModelTransform(Primitives.TriangularPrism.getMesh(), brickTexture);
+            sideRoof3 = new ModelTransform(Primitives.TriangularPrism.getMesh(), brickTexture);
+            sideRoof6a = new ModelTransform(Primitives.Cube.getMesh(), brickTexture);
+            sideRoof6b = new ModelTransform(Primitives.TriangularPrism.getMesh(), brickTexture);
+
+            roofWindow1 = new ModelTransform(Primitives.Cube.getMesh(), brickTexture);
+            roofWindow2 = new ModelTransform(Primitives.Cube.getMesh(), brickTexture);
+            roofWindow3 = new ModelTransform(Primitives.Cube.getMesh(), brickTexture);
+            roofWindow3_1 = new ModelTransform(Primitives.Cube.getMesh(), brickTexture);
+            roofWindow3_2 = new ModelTransform(Primitives.Cube.getMesh(), brickTexture);
+            roofWindow4 = new ModelTransform(Primitives.Cube.getMesh(), brickTexture);
+            roofWindow5 = new ModelTransform(Primitives.Cube.getMesh(), brickTexture);
+            roofWindow6 = new ModelTransform(Primitives.Cube.getMesh(), brickTexture);
+            roofWindow7 = new ModelTransform(Primitives.Cube.getMesh(), brickTexture);
+            roofWindow8 = new ModelTransform(Primitives.Cube.getMesh(), brickTexture);
+            roofWindow9 = new ModelTransform(Primitives.Cube.getMesh(), brickTexture);
+
+            chimney1 = new ModelTransform(Primitives.Cube.getMesh(), brickTexture);
+            chimney2 = new ModelTransform(Primitives.Cube.getMesh(), brickTexture);
+
+            umbrella1 = new ModelTransform(Primitives.Pyramid.getMesh(), tileTexture);
+            umbrella1b = new ModelTransform(Primitives.Pyramid.getMesh(), tileTexture);
+            umbrella2 = new ModelTransform(Primitives.Pyramid.getMesh(), tileTexture);
+            umbrella3 = new ModelTransform(Primitives.Pyramid.getMesh(), tileTexture);
+            umbrella4 = new ModelTransform(Primitives.Pyramid.getMesh(), tileTexture);
+            umbrella5 = new ModelTransform(Primitives.Pyramid.getMesh(), tileTexture);
+            umbrella6 = new ModelTransform(Primitives.Pyramid.getMesh(), tileTexture);
+            umbrella7 = new ModelTransform(Primitives.Pyramid.getMesh(), tileTexture);
+
+            pole1 = new ModelTransform(Primitives.Cube.getMesh(), leatherTexture);
+            pole1b = new ModelTransform(Primitives.Cube.getMesh(), leatherTexture);
+            pole2 = new ModelTransform(Primitives.Cube.getMesh(), leatherTexture);
+            pole3 = new ModelTransform(Primitives.Cube.getMesh(), leatherTexture);
+            pole4 = new ModelTransform(Primitives.Cube.getMesh(), leatherTexture);
+            pole5 = new ModelTransform(Primitives.Cube.getMesh(), leatherTexture);
+            pole6 = new ModelTransform(Primitives.Cube.getMesh(), leatherTexture);
+            pole7 = new ModelTransform(Primitives.Cube.getMesh(), leatherTexture);
+
+            // TPT = new ModelTransform(Primitives.TriangularPrism.getMesh(), umbrellaMat); 
+            
+            //POSITION SET
+            //TPT.position.set(-30, 30, 30); 
+            //TPT.scale.set(5, 5, 5); 
+
+            ground.scale.set(30,25,1);
+            ground.rotation.set(-90,0,0);
+            ground.position.set(-0.5,-3.1,5.5); 
+
+            dock.position.set(-0.5,-1.5, -1);
+            dock.scale.set(30,3,12);
+            
+            house1.position.set(-12,3.25,-4.5);
+            house1.scale.set(7,6.5,5);
+
+            house2.position.set(-7,3.5,-4.5);
+            house2.scale.set(3,7,5);
+
+            house3.position.set(-3,4.5,-4.5);
+            house3.scale.set(5,9,5);
+
+            house4.position.set(2,5,-4.5);
+            house4.scale.set(5,10,5);
+
+            house5.position.set(7,5,-4.5);
+            house5.scale.set(5,10,5);
+
+            house6.position.set(12,3.5,-4.5);
+            house6.scale.set(5,7,5);
+
+            roof6.scale.set(2.5,4,2.5);
+            roof6.rotation.set(0,0,0);
+            roof6.position.set(12,7.0,-4.51);
+
+            roof5.scale.set(2.5,2,2.5);
+            roof5.rotation.set(0,0,0);
+            roof5.position.set(7,10,-4.5);
+
+            roof4.scale.set(2.5,2.75,2.5);
+            roof4.rotation.set(0,0,0);
+            roof4.position.set(2,10,-4.5);
+
+            roof3.scale.set(2.5,4.35,2.5);
+            roof3.rotation.set(0,0,0);
+            roof3.position.set(-3,9,-4.52);
+
+            roof2.scale.set(1.5,2.5,2.5);
+            roof2.rotation.set(0,0,0);
+            roof2.position.set(-7,7,-4.5);
+
+            roof1.scale.set(3.52,2.5,2.5);
+            roof1.rotation.set(0,0,0);
+            roof1.position.set(-12,6.5,-4.51);
+
+            sideRoof6a.position.set(12,7.72,-2.98);
+            sideRoof6a.scale.set(2.5,1.5,2);
+
+            sideRoof6b.position.set(12,8.45,-3.24);
+            sideRoof6b.rotation.set(0,90,0);
+            sideRoof6b.scale.set(1.25,2.55,1.27);
+
+            sideRoof3.position.set(-3,9.0,-3.25);
+            sideRoof3.rotation.set(0,90,0);
+            sideRoof3.scale.set(1.25,1,2.4);
+
+            sideRoof1a.position.set(-12,7.,-2.98);
+            sideRoof1a.scale.set(2.5,1,2);
+
+            sideRoof1b.position.set(-12,7.5,-3.29);
+            sideRoof1b.rotation.set(0,90,0);
+            sideRoof1b.scale.set(1.3,1.45,1.26);
+
+            roofWindow1.position.set(-14.25,7.75,-3.25);
+            roofWindow1.scale.set(1,1,1);
+
+            roofWindow2.position.set(-9.5,7.75,-3.25);
+            roofWindow2.scale.set(1,1,1);
+
+            roofWindow3.position.set(-7.65,8.,-3.25);
+            roofWindow3.scale.set(.75,1,1);
+
+            roofWindow3_1.position.set(-4.3,10.5,-3.);
+            roofWindow3_1.scale.set(1,1,1);
+
+            roofWindow3_2.position.set(-1.5,10.5,-3.);
+            roofWindow3_2.scale.set(1,1,1);
+
+            roofWindow4.position.set(-6.35,8.,-3.25);
+            roofWindow4.scale.set(.75,1,1);
+
+            roofWindow5.position.set(.5,11.,-3.25);
+            roofWindow5.scale.set(.75,1.25,1);
+
+            roofWindow6.position.set(2,11.,-3.25);
+            roofWindow6.scale.set(.75,1.25,1);
+
+            roofWindow7.position.set(3.5,11.,-3.25);
+            roofWindow7.scale.set(.75,1.25,1);
+
+            roofWindow8.position.set(6,10.5,-3.05);
+            roofWindow8.scale.set(.75,1.25,1);
+
+            roofWindow9.position.set(8,10.5,-3.05);
+            roofWindow9.scale.set(.75,1.25,1);
+
+            chimney1.position.set(-2.90,13.15,-4.5);
+            chimney1.scale.set(.75,1.25,1);
+
+            chimney2.position.set(2,12.75,-4.5);
+            chimney2.scale.set(.75,1.25,1);
+
+            umbrella1.position.set(-14,2.,0);
+            umbrella1.scale.set(3,1,3);
+
+            umbrella1b.position.set(-11,2.,0);
+            umbrella1b.scale.set(3,1,3);
+
+            umbrella2.position.set(-7,2.,0);
+            umbrella2.scale.set(3,1,3);
+
+            umbrella3.position.set(-1,2.,0);
+            umbrella3.scale.set(3,1,3);
+
+            umbrella4.position.set(2,2.,0);
+            umbrella4.scale.set(3,1,3);
+
+            umbrella5.position.set(7,2.,0);
+            umbrella5.scale.set(3,1,3);
+
+            umbrella6.position.set(10,2.,0);
+            umbrella6.scale.set(3,1,3);
+
+            umbrella7.position.set(13,2.,0);
+            umbrella7.scale.set(3,1,3);
+
+            pole1.position.set(-14,1,0);
+            pole1.scale.set(.075,3,.075);
+
+            pole1b.position.set(-11,1,0);
+            pole1b.scale.set(.075,3,.075);
+
+            pole2.position.set(-7,1,0);
+            pole2.scale.set(.075,3,.075);
+
+            pole3.position.set(-1,1,0);
+            pole3.scale.set(.075,3,.075);
+
+            pole4.position.set(2,1,0);
+            pole4.scale.set(.075,3,.075);
+
+            pole5.position.set(7,1,0);
+            pole5.scale.set(.075,3,.075);
+
+            pole6.position.set(10,1,0);
+            pole6.scale.set(.075,3,.075);
+
+            pole7.position.set(13,1,0);
+            pole7.scale.set(.075,3,.075);
+
+            g_grid = new GridAxis();
+
+            renderLoop = new RenderLoop(draw).start();
+        }
+
+        function draw(deltaTime){
+            Input.update();
+            gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+            g_cameraController.update();
+
+            //UPDATE THE OBJECTS 
+
+            ground.update();
+            dock.update();
+
+            house1.update();
+            house2.update();
+            house3.update();
+            house4.update();
+            house5.update();
+            house6.update();
+
+            roof1.update();
+            roof2.update();
+            roof3.update();
+            roof4.update();
+            roof5.update();
+            roof6.update();
+
+            sideRoof1a.update();
+            sideRoof1b.update();
+            sideRoof3.update();
+            sideRoof6a.update();
+            sideRoof6b.update();
+
+            roofWindow1.update();
+            roofWindow2.update();
+            roofWindow3.update();
+            roofWindow3_1.update();
+            roofWindow3_2.update();
+            roofWindow4.update();
+            roofWindow5.update();
+            roofWindow6.update();
+            roofWindow7.update();
+            roofWindow8.update();
+            roofWindow9.update();
+
+            chimney1.update();
+            chimney2.update();
+
+            umbrella1.update();
+            umbrella1b.update();
+            umbrella2.update();
+            umbrella3.update();
+            umbrella4.update();
+            umbrella5.update();
+            umbrella6.update();
+            umbrella7.update();
+
+            pole1.update();
+            pole1b.update();
+            pole2.update();
+            pole3.update();
+            pole4.update();
+            pole5.update();
+            pole6.update();
+            pole7.update();
+
+            //TPT.update();
+
+            let shaderData = { lightingData: g_lightingData};
+
+            //DRAWING THE MODEL 
+            g_renderer.drawModel(ground, g_camera, shaderData);
+            g_renderer.drawModel(dock, g_camera, shaderData); 
+
+            g_renderer.drawModel(house1, g_camera, shaderData);
+            g_renderer.drawModel(house2, g_camera, shaderData);
+            g_renderer.drawModel(house3, g_camera, shaderData);
+            g_renderer.drawModel(house4, g_camera, shaderData);
+            g_renderer.drawModel(house5, g_camera, shaderData);
+            g_renderer.drawModel(house6, g_camera, shaderData);
+
+            g_renderer.drawModel(roof1, g_camera, shaderData);
+            g_renderer.drawModel(roof2, g_camera, shaderData);
+            g_renderer.drawModel(roof3, g_camera, shaderData);
+            g_renderer.drawModel(roof4, g_camera, shaderData);
+            g_renderer.drawModel(roof5, g_camera, shaderData);
+            g_renderer.drawModel(roof6, g_camera, shaderData);
+
+            g_renderer.drawModel(sideRoof1a, g_camera, shaderData);
+            g_renderer.drawModel(sideRoof1b, g_camera, shaderData);
+            g_renderer.drawModel(sideRoof3, g_camera, shaderData);
+            g_renderer.drawModel(sideRoof6a, g_camera, shaderData);
+            g_renderer.drawModel(sideRoof6b, g_camera, shaderData);
+
+            g_renderer.drawModel(roofWindow1, g_camera, shaderData);
+            g_renderer.drawModel(roofWindow2, g_camera, shaderData);
+            g_renderer.drawModel(roofWindow3, g_camera, shaderData);
+            g_renderer.drawModel(roofWindow3_1, g_camera, shaderData);
+            g_renderer.drawModel(roofWindow3_2, g_camera, shaderData);
+            g_renderer.drawModel(roofWindow4, g_camera, shaderData);
+            g_renderer.drawModel(roofWindow5, g_camera, shaderData);
+            g_renderer.drawModel(roofWindow6, g_camera, shaderData);
+            g_renderer.drawModel(roofWindow7, g_camera, shaderData);
+            g_renderer.drawModel(roofWindow8, g_camera, shaderData);
+            g_renderer.drawModel(roofWindow9, g_camera, shaderData);
+
+            g_renderer.drawModel(chimney1, g_camera, shaderData);
+            g_renderer.drawModel(chimney2, g_camera, shaderData);
+
+            g_renderer.drawModel(umbrella1, g_camera, shaderData);
+            g_renderer.drawModel(umbrella1b, g_camera, shaderData);
+            g_renderer.drawModel(umbrella2, g_camera, shaderData);
+            g_renderer.drawModel(umbrella3, g_camera, shaderData);
+            g_renderer.drawModel(umbrella4, g_camera, shaderData);
+            g_renderer.drawModel(umbrella5, g_camera, shaderData);
+            g_renderer.drawModel(umbrella6, g_camera, shaderData);
+            g_renderer.drawModel(umbrella7, g_camera, shaderData);
+
+            g_renderer.drawModel(pole1, g_camera, shaderData);
+            g_renderer.drawModel(pole1b, g_camera, shaderData);
+            g_renderer.drawModel(pole2, g_camera, shaderData);
+            g_renderer.drawModel(pole3, g_camera, shaderData);
+            g_renderer.drawModel(pole4, g_camera, shaderData);
+            g_renderer.drawModel(pole5, g_camera, shaderData);
+            g_renderer.drawModel(pole6, g_camera, shaderData);
+
+            //g_renderer.drawModel(TPT, g_camera, shaderData); 
+
+            g_grid.draw(g_camera);
+        }
+    </script>
+</body>
+</html>
