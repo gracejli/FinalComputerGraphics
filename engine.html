@@ -106,6 +106,8 @@
             GLUtils.loadTexture("leather_texture", "ressources/leather_texture.png");
             GLUtils.loadTexture("plaster_texture", "ressources/plaster_texture.png");
             GLUtils.loadTexture("water_texture", "ressources/water_texture.png");  
+            GLUtils.loadTexture("concrete_texture", "ressources/concrete_texture.png"); 
+            GLUtils.loadTexture("concrete_texture_rough", "ressources/rough_concrete_texture.png")
     
 
             //ALL MATERIALS
@@ -144,6 +146,14 @@
                 shininess : 10, specularIntensity: 0.8,
                 mainTexture: "water_texture"}; 
 
+            let concreteTexture = {tint: new V3(1, 1, 1),
+                shininess : 1, specularIntensity: 0.1,
+                mainTexture: "concrete_texture"}; 
+            
+            let concreteTextureRough = {tint: new V3(1, 1, 1),
+                shininess : 1, specularIntensity: 0.1,
+                mainTexture: "concrete_texture_rough"}; 
+
             //the tints need to be updated for these colors but I've applied them to the proper buildings 
             let plasterTextureBlue = {tint: new V3(0.65, 0.74, 1.0),
                 shininess : 10, specularIntensity: 0.8,
@@ -160,6 +170,10 @@
             let plasterTextureGreen = {tint: new V3(0.87, 1.0, 0.85),
                 shininess : 10, specularIntensity: 0.2,
                 mainTexture: "plaster_texture"}; 
+
+            let plasterTextureWhite= {tint: new V3(1.0, 1.0, 1.0),
+                shininess : 10, specularIntensity: 0.9,
+                mainTexture: "plaster_texture"}; 
             
 
     
@@ -170,9 +184,9 @@
 
             //MODEL TRANSFORMS
             water = new ModelTransform(Primitives.Quad.getMesh(), waterTexture);
-            dock = new ModelTransform(Primitives.Cube.getMesh(), woodTexture);
+            dock = new ModelTransform(Primitives.Cube.getMesh(), concreteTexture);
 
-            dockSide = new ModelTransform(Primitives.Quad.getMesh(), brickTexture); 
+            dockSide = new ModelTransform(Primitives.Quad.getMesh(), concreteTextureRough); 
 
             //triangularPrism = new ModelTransform(Primitives.Triangularprism.getMesh(), grassMat); 
 
@@ -211,14 +225,14 @@
             chimney1 = new ModelTransform(Primitives.Cube.getMesh(), brickTexture);
             chimney2 = new ModelTransform(Primitives.Cube.getMesh(), brickTexture);
 
-            umbrella1 = new ModelTransform(Primitives.Pyramid.getMesh(), tileTexture);
-            umbrella1b = new ModelTransform(Primitives.Pyramid.getMesh(), tileTexture);
-            umbrella2 = new ModelTransform(Primitives.Pyramid.getMesh(), tileTexture);
-            umbrella3 = new ModelTransform(Primitives.Pyramid.getMesh(), tileTexture);
-            umbrella4 = new ModelTransform(Primitives.Pyramid.getMesh(), tileTexture);
-            umbrella5 = new ModelTransform(Primitives.Pyramid.getMesh(), tileTexture);
-            umbrella6 = new ModelTransform(Primitives.Pyramid.getMesh(), tileTexture);
-            umbrella7 = new ModelTransform(Primitives.Pyramid.getMesh(), tileTexture);
+            umbrella1 = new ModelTransform(Primitives.Pyramid.getMesh(), plasterTextureWhite);
+            umbrella1b = new ModelTransform(Primitives.Pyramid.getMesh(), plasterTextureWhite);
+            umbrella2 = new ModelTransform(Primitives.Pyramid.getMesh(), plasterTextureWhite);
+            umbrella3 = new ModelTransform(Primitives.Pyramid.getMesh(), plasterTextureWhite);
+            umbrella4 = new ModelTransform(Primitives.Pyramid.getMesh(), plasterTextureWhite);
+            umbrella5 = new ModelTransform(Primitives.Pyramid.getMesh(), plasterTextureWhite);
+            umbrella6 = new ModelTransform(Primitives.Pyramid.getMesh(), plasterTextureWhite);
+            umbrella7 = new ModelTransform(Primitives.Pyramid.getMesh(), plasterTextureWhite);
 
             pole1 = new ModelTransform(Primitives.Cube.getMesh(), leatherTexture);
             pole1b = new ModelTransform(Primitives.Cube.getMesh(), leatherTexture);
