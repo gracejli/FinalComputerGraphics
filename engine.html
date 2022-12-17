@@ -103,7 +103,9 @@
             GLUtils.loadTexture("grass_texture", "ressources/grass_texture.png"); 
             GLUtils.loadTexture("brick_texture", "ressources/brick_texture.png"); 
             GLUtils.loadTexture("tile_texture", "ressources/tile_texture.png"); 
-            GLUtils.loadTexture("leather_texture", "ressources/leather_texture.png"); 
+            GLUtils.loadTexture("leather_texture", "ressources/leather_texture.png");
+            GLUtils.loadTexture("plaster_texture", "ressources/plaster_texture.png");
+            GLUtils.loadTexture("water_texture", "ressources/water_texture.png");  
     
 
             //ALL MATERIALS
@@ -117,21 +119,48 @@
             let uvTestMat = {tint: new V3(1, 1, 1),
                 shininess : 10, specularIntensity: 0.2,
                 mainTexture: "uv-test"}; 
+
             let woodTexture = {tint: new V3(1, 1, 1), 
                 shininess : 10, specularIntensity: 0.8,
                 mainTexture: "wood_texture"}; 
+
             let grassTexture = {tint: new V3(1, 1, 1),
                 shininess : 10, specularIntensity: 0.2,
                 mainTexture: "grass_texture"}; 
+
             let brickTexture = {tint: new V3(1, 1, 1),
                 shininess : 10, specularIntensity: 0.8,
                 mainTexture: "brick_texture"}; 
+
             let tileTexture = {tint: new V3(1, 1, 1),
                 shininess : 10, specularIntensity: 0.2,
                 mainTexture: "tile_texture"}; 
+
             let leatherTexture = {tint: new V3(1, 1, 1),
                 shininess : 10, specularIntensity: 0.2,
                 mainTexture: "leather_texture"}; 
+
+            let waterTexture = {tint: new V3(1, 1, 1),
+                shininess : 10, specularIntensity: 0.8,
+                mainTexture: "water_texture"}; 
+
+            //the tints need to be updated for these colors but I've applied them to the proper buildings 
+            let plasterTextureBlue = {tint: new V3(0.65, 0.74, 1.0),
+                shininess : 10, specularIntensity: 0.2,
+                mainTexture: "plaster_texture"}; 
+
+            let plasterTextureYellow = {tint: new V3(1.0, 0.95, 0),
+                shininess : 10, specularIntensity: 0.2,
+                mainTexture: "plaster_texture"}; 
+
+            let plasterTextureRed = {tint: new V3(1.0, 0.0, 0.0),
+                shininess : 10, specularIntensity: 0.2,
+                mainTexture: "plaster_texture"}; 
+
+            let plasterTextureGreen = {tint: new V3(0.0, 1.0, 0.0),
+                shininess : 10, specularIntensity: 0.2,
+                mainTexture: "plaster_texture"}; 
+            
 
     
             //LOAD MESHES 
@@ -140,30 +169,30 @@
            
 
             //MODEL TRANSFORMS
-            ground = new ModelTransform(Primitives.Quad.getMesh(), grassTexture);
+            ground = new ModelTransform(Primitives.Quad.getMesh(), waterTexture);
             dock = new ModelTransform(Primitives.Cube.getMesh(), woodTexture);
 
             //triangularPrism = new ModelTransform(Primitives.Triangularprism.getMesh(), grassMat); 
 
-            house1 = new ModelTransform(Primitives.Cube.getMesh(), brickTexture);
-            house2 = new ModelTransform(Primitives.Cube.getMesh(), brickTexture);
-            house3 = new ModelTransform(Primitives.Cube.getMesh(), brickTexture);
-            house4 = new ModelTransform(Primitives.Cube.getMesh(), brickTexture);
-            house5 = new ModelTransform(Primitives.Cube.getMesh(), brickTexture);
-            house6 = new ModelTransform(Primitives.Cube.getMesh(), brickTexture);
+            house1 = new ModelTransform(Primitives.Cube.getMesh(), plasterTextureBlue);
+            house2 = new ModelTransform(Primitives.Cube.getMesh(), plasterTextureYellow);
+            house3 = new ModelTransform(Primitives.Cube.getMesh(), plasterTextureBlue);
+            house4 = new ModelTransform(Primitives.Cube.getMesh(), plasterTextureRed);
+            house5 = new ModelTransform(Primitives.Cube.getMesh(), plasterTextureYellow);
+            house6 = new ModelTransform(Primitives.Cube.getMesh(), plasterTextureGreen);
             
-            roof1 = new ModelTransform(Primitives.TriangularPrism.getMesh(), woodTexture);
-            roof2 = new ModelTransform(Primitives.TriangularPrism.getMesh(), woodTexture);
-            roof3 = new ModelTransform(Primitives.TriangularPrism.getMesh(), woodTexture);
-            roof4 = new ModelTransform(Primitives.TriangularPrism.getMesh(), woodTexture);
-            roof5 = new ModelTransform(Primitives.TriangularPrism.getMesh(), woodTexture);
-            roof6 = new ModelTransform(Primitives.TriangularPrism.getMesh(), woodTexture);
+            roof1 = new ModelTransform(Primitives.TriangularPrism.getMesh(), tileTexture);
+            roof2 = new ModelTransform(Primitives.TriangularPrism.getMesh(), tileTexture);
+            roof3 = new ModelTransform(Primitives.TriangularPrism.getMesh(), tileTexture);
+            roof4 = new ModelTransform(Primitives.TriangularPrism.getMesh(), tileTexture);
+            roof5 = new ModelTransform(Primitives.TriangularPrism.getMesh(), tileTexture);
+            roof6 = new ModelTransform(Primitives.TriangularPrism.getMesh(), tileTexture);
 
-            sideRoof1a = new ModelTransform(Primitives.Cube.getMesh(), brickTexture);
-            sideRoof1b = new ModelTransform(Primitives.TriangularPrism.getMesh(), brickTexture);
-            sideRoof3 = new ModelTransform(Primitives.TriangularPrism.getMesh(), brickTexture);
-            sideRoof6a = new ModelTransform(Primitives.Cube.getMesh(), brickTexture);
-            sideRoof6b = new ModelTransform(Primitives.TriangularPrism.getMesh(), brickTexture);
+            sideRoof1a = new ModelTransform(Primitives.Cube.getMesh(), plasterTextureBlue);
+            sideRoof1b = new ModelTransform(Primitives.TriangularPrism.getMesh(), plasterTextureBlue);
+            sideRoof3 = new ModelTransform(Primitives.TriangularPrism.getMesh(), plasterTextureBlue);
+            sideRoof6a = new ModelTransform(Primitives.Cube.getMesh(), plasterTextureGreen);
+            sideRoof6b = new ModelTransform(Primitives.TriangularPrism.getMesh(), plasterTextureGreen);
 
             roofWindow1 = new ModelTransform(Primitives.Cube.getMesh(), brickTexture);
             roofWindow2 = new ModelTransform(Primitives.Cube.getMesh(), brickTexture);
