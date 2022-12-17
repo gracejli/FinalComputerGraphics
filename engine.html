@@ -42,7 +42,7 @@
         var g_camera;
         var g_cameraController;
 
-        var ground, dock;
+        var water, dock, dockSide; 
 
         var house1, house2, house3, house4, house5, house6;
         var roof1, roof2, roof3, roof4, roof5, roof6;
@@ -146,18 +146,18 @@
 
             //the tints need to be updated for these colors but I've applied them to the proper buildings 
             let plasterTextureBlue = {tint: new V3(0.65, 0.74, 1.0),
+                shininess : 10, specularIntensity: 0.8,
+                mainTexture: "plaster_texture"}; 
+
+            let plasterTextureYellow = {tint: new V3(1.0, 0.98, 0.64),
                 shininess : 10, specularIntensity: 0.2,
                 mainTexture: "plaster_texture"}; 
 
-            let plasterTextureYellow = {tint: new V3(1.0, 0.95, 0),
+            let plasterTextureRed = {tint: new V3(1.0, 0.52, 0.43),
                 shininess : 10, specularIntensity: 0.2,
                 mainTexture: "plaster_texture"}; 
 
-            let plasterTextureRed = {tint: new V3(1.0, 0.0, 0.0),
-                shininess : 10, specularIntensity: 0.2,
-                mainTexture: "plaster_texture"}; 
-
-            let plasterTextureGreen = {tint: new V3(0.0, 1.0, 0.0),
+            let plasterTextureGreen = {tint: new V3(0.87, 1.0, 0.85),
                 shininess : 10, specularIntensity: 0.2,
                 mainTexture: "plaster_texture"}; 
             
@@ -169,8 +169,10 @@
            
 
             //MODEL TRANSFORMS
-            ground = new ModelTransform(Primitives.Quad.getMesh(), waterTexture);
+            water = new ModelTransform(Primitives.Quad.getMesh(), waterTexture);
             dock = new ModelTransform(Primitives.Cube.getMesh(), woodTexture);
+
+            dockSide = new ModelTransform(Primitives.Quad.getMesh(), brickTexture); 
 
             //triangularPrism = new ModelTransform(Primitives.Triangularprism.getMesh(), grassMat); 
 
@@ -233,12 +235,16 @@
             //TPT.position.set(-30, 30, 30); 
             //TPT.scale.set(5, 5, 5); 
 
-            ground.scale.set(30,25,1);
-            ground.rotation.set(-90,0,0);
-            ground.position.set(-0.5,-3.1,5.5); 
+            water.scale.set(30,25,1);
+            water.rotation.set(-90,0,0);
+            water.position.set(-0.5,-3.1,5.5); 
 
             dock.position.set(-0.5,-1.5, -1);
             dock.scale.set(30,3,12);
+
+            dockSide.position.set(-0.5, -1.5, 5.01); 
+            dockSide.rotation.set(0, 0, 0); 
+            dockSide.scale.set(30, 3, 10); 
             
             house1.position.set(-12,3.25,-4.5);
             house1.scale.set(7,6.5,5);
@@ -399,8 +405,9 @@
 
             //UPDATE THE OBJECTS 
 
-            ground.update();
+            water.update();
             dock.update();
+            dockSide.update(); 
 
             house1.update();
             house2.update();
@@ -460,8 +467,9 @@
             let shaderData = { lightingData: g_lightingData};
 
             //DRAWING THE MODEL 
-            g_renderer.drawModel(ground, g_camera, shaderData);
+            g_renderer.drawModel(water, g_camera, shaderData);
             g_renderer.drawModel(dock, g_camera, shaderData); 
+            g_renderer.drawModel(dockSide, g_camera, shaderData); 
 
             g_renderer.drawModel(house1, g_camera, shaderData);
             g_renderer.drawModel(house2, g_camera, shaderData);
