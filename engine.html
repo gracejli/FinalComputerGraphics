@@ -18,10 +18,17 @@
     <script src="../common/dat.gui.min.js"></script>
     <script src="../common/stats.min.js"></script>
     <script src="../common/objparser.js"></script>
-
+    
+    <script src="howler.js"></script>
     <script src="renderer.js"></script>
     <script src="modeltransform.js"></script>
     <script src="primitives.js"></script>
+
+    <button id="startbutton" width="300" height="300" onclick="load()" style="
+        background-color: #111111; border: none; color: white; padding: 50px 50px; text-align: center;
+        text-decoration: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+        font-size: 50px;">Click here to start the animation</button>
+
 
     <script type="text/javascript">
         "use strict"; // use strict javascript compiling
@@ -49,7 +56,7 @@
         var house1, house2, house3, house4, house5, house6;
         var roof1, roof2, roof3, roof4, roof5, roof6;
         var sideRoof6a, sideRoof6b, sideRoof1a, sideRoof1b, sideRoof3;
-	var sideR1L, sideR1R, sideR6L, sideR6R;
+	    var sideR1L, sideR1R, sideR6L, sideR6R;
         var roofWindow1, roofWindow2, roofWindow3, roofWindow3_1, roofWindow3_2, roofWindow4, roofWindow5, 
         roofWindow6, roofWindow7, roofWindow8, roofWindow9;
         var chimney1, chimney2;
@@ -57,7 +64,14 @@
         var umbrella1, umbrella1b, umbrella2, umbrella3, umbrella4, umbrella5, umbrella6, umbrella7;
         var pole1, pole1b, pole2, pole3, pole4, pole5, pole6, pole7;
 
-        //var g_grid;
+        var music; 
+
+        
+        // dat.gui to mute/unmute our sound
+        var gui_data = {mute: false};
+        var gui = new dat.GUI({ width: 100 } );
+        gui.add(gui_data, "mute").onChange(function(value){music?.mute(value);});
+
 
         var g_renderer;
 
@@ -97,8 +111,15 @@
             g_cameraController = new OrbiterCameraController(canvas, g_camera);
             g_cameraController.target.set(0,0,0);
 
-            //TODO DONE: load texture from ressources folder to TextureCache
-             //TODO DONE: add mainTexture property with loaded texture to material
+            // load an play the music using howler.js
+            // https://howlerjs.com/
+            // documentation: https://github.com/goldfire/howler.js#documentation
+            music = new Howl({
+                src: ['ressources/AndrewGold-SpookyScarySkeletons.mp3'],
+                html5: true // use streaming audio if possible
+            });
+            music.play();
+            music.mute(gui_data.mute);
 
             //LOADED TEXTURES
             GLUtils.loadTexture("uv-test", "ressources/uv-test.png"); 
@@ -112,15 +133,7 @@
             GLUtils.loadTexture("concrete_texture", "ressources/concrete_texture.png"); 
             GLUtils.loadTexture("concrete_texture_rough", "ressources/rough_concrete_texture.png")
     
-
             //ALL MATERIALS
-            // let uvTestMat = {tint: new V3(1, 1, 1), mainTexture: "uv-test"}; 
-            // let woodTexture = {tint: new V3(1, 1, 1), mainTexture: "wood_texture"}; 
-            // let grassTexture = {tint: new V3(1, 1, 1), mainTexture: "grass_texture"}; 
-            // let brickTexture = {tint: new V3(1, 1, 1), mainTexture: "brick_texture"}; 
-            // let tileTexture = {tint: new V3(1, 1, 1), mainTexture: "tile_texture"}; 
-            // let leatherTexture = {tint: new V3(1, 1, 1), mainTexture: "leather_texture"}; 
-
             let uvTestMat = {tint: new V3(1, 1, 1),
                 shininess : 10, specularIntensity: 0.2,
                 mainTexture: "uv-test"}; 
@@ -183,16 +196,13 @@
             //LOAD MESHES 
             let monkeyMesh = OBJLoader.getMesh("monkey", "ressources/monkeyhead.obj");
             let boatMesh = OBJLoader.getMesh("boat", "ressources/boat.obj"); 
-            //let humanMesh = OBJLoader.getMesh("human", "ressources/human.obj"); 
-           
+        
 
             //MODEL TRANSFORMS
             water = new ModelTransform(Primitives.Quad.getMesh(), waterTexture);
             dock = new ModelTransform(Primitives.Cube.getMesh(), concreteTexture);
             dockSide = new ModelTransform(Primitives.Quad.getMesh(), concreteTextureRough); 
             boat = new ModelTransform(boatMesh, woodTexture); 
-
-            //triangularPrism = new ModelTransform(Primitives.Triangularprism.getMesh(), grassMat); 
 
             house1 = new ModelTransform(Primitives.Cube.getMesh(), plasterTextureBlue);
             house2 = new ModelTransform(Primitives.Cube.getMesh(), plasterTextureYellow);
@@ -214,7 +224,7 @@
             sideRoof6a = new ModelTransform(Primitives.Cube.getMesh(), plasterTextureGreen);
             sideRoof6b = new ModelTransform(Primitives.TriangularPrism.getMesh(), plasterTextureGreen);
 		
-	    sideR1L = new ModelTransform(Primitives.Quad.getMesh(), tileTexture);
+	        sideR1L = new ModelTransform(Primitives.Quad.getMesh(), tileTexture);
             sideR1R = new ModelTransform(Primitives.Quad.getMesh(), tileTexture);
             sideR6L = new ModelTransform(Primitives.Quad.getMesh(), tileTexture);
             sideR6R = new ModelTransform(Primitives.Quad.getMesh(), tileTexture);
@@ -252,12 +262,8 @@
             pole6 = new ModelTransform(Primitives.Cube.getMesh(), leatherTexture);
             pole7 = new ModelTransform(Primitives.Cube.getMesh(), leatherTexture);
 
-            // TPT = new ModelTransform(Primitives.TriangularPrism.getMesh(), umbrellaMat); 
-            
-            //POSITION SET
-            //TPT.position.set(-30, 30, 30); 
-            //TPT.scale.set(5, 5, 5); 
-
+         
+            //LOCATION, POSITION, ROTATION SET
             boat.scale.set = (1, 1, 1); 
             boat.rotation.set(0, 90, 0); 
             boat.position.set(0, -3, 5); 
@@ -581,6 +587,12 @@
             //g_renderer.drawModel(TPT, g_camera, shaderData); 
 
             //g_grid.draw(g_camera);
+        }
+
+        function load(){
+            var button = document.getElementById("startbutton");
+            button.remove();
+            setup();
         }
     </script>
 </body>
