@@ -44,6 +44,8 @@
 
         var water, dock, dockSide; 
 
+        var boat; 
+
         var house1, house2, house3, house4, house5, house6;
         var roof1, roof2, roof3, roof4, roof5, roof6;
         var sideRoof6a, sideRoof6b, sideRoof1a, sideRoof1b, sideRoof3;
@@ -180,14 +182,15 @@
     
             //LOAD MESHES 
             let monkeyMesh = OBJLoader.getMesh("monkey", "ressources/monkeyhead.obj");
+            let boatMesh = OBJLoader.getMesh("boat", "ressources/boat.obj"); 
             //let humanMesh = OBJLoader.getMesh("human", "ressources/human.obj"); 
            
 
             //MODEL TRANSFORMS
             water = new ModelTransform(Primitives.Quad.getMesh(), waterTexture);
             dock = new ModelTransform(Primitives.Cube.getMesh(), concreteTexture);
-
             dockSide = new ModelTransform(Primitives.Quad.getMesh(), concreteTextureRough); 
+            boat = new ModelTransform(boatMesh, woodTexture); 
 
             //triangularPrism = new ModelTransform(Primitives.Triangularprism.getMesh(), grassMat); 
 
@@ -254,6 +257,10 @@
             //POSITION SET
             //TPT.position.set(-30, 30, 30); 
             //TPT.scale.set(5, 5, 5); 
+
+            boat.scale.set = (1, 1, 1); 
+            boat.rotation.set(0, 90, 0); 
+            boat.position.set(0, -3, 5); 
 
             water.scale.set(30,25,1);
             water.rotation.set(-90,0,0);
@@ -326,7 +333,7 @@
             sideRoof1b.rotation.set(0,90,0);
             sideRoof1b.scale.set(1.3,1.45,1.26);
 		
-	    sideR1L.position.set(-12.66,8.2,-3.29);
+	        sideR1L.position.set(-12.66,8.2,-3.29);
             sideR1L.rotation.set(41,90,0);
             sideR1L.scale.set(2.5,2,1.26);
 
@@ -441,6 +448,8 @@
 
             //UPDATE THE OBJECTS 
 
+            boat.update(); 
+
             water.update();
             dock.update();
             dockSide.update(); 
@@ -507,6 +516,7 @@
             let shaderData = { lightingData: g_lightingData};
 
             //DRAWING THE MODEL 
+            g_renderer.drawModel(boat, g_camera, shaderData); 
             g_renderer.drawModel(water, g_camera, shaderData);
             g_renderer.drawModel(dock, g_camera, shaderData); 
             g_renderer.drawModel(dockSide, g_camera, shaderData); 
