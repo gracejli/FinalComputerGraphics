@@ -66,6 +66,8 @@
 
         var music; 
 
+        var timer; 
+
         
         // dat.gui to mute/unmute our sound
         var gui_data = {mute: false};
@@ -116,7 +118,7 @@
             // documentation: https://github.com/goldfire/howler.js#documentation
             music = new Howl({
                 src: ['ressources/road_sounds.mp3'],
-                html5: true // use streaming audio if possible
+                html5: false// use streaming audio if possible
             });
             music.play();
             music.mute(gui_data.mute);
@@ -448,6 +450,29 @@
         }
 
         function draw(deltaTime){
+
+            let bpm = 30; 
+            let bps = bpm/60.0; // this many beats per second
+            let beatDuration = 1.0/bps; // one beat lasts this long
+
+            timer += deltaTime; // count up timer variable
+            if(timer > beatDuration){ // do stuff every beat
+                timer = Time.time % beatDuration; // we can't simply set it to 0 here, because we will accumulate error.
+                                        // deltaTime is not 100% accurate (eg. with 60 fps 60*deltaTime != 1.00)
+                                        // but maybe 0.98 or 1.01.
+                                        // Since we work with sound and want a consistent event at exact intervals,
+                                        // we have to use the Time.time to decide when to act.
+                let r = Math.random();
+                let g = Math.random();
+                let b = Math.random();
+                gl.clearColor(r, g, b, 1); // set clear color (RGBA)
+            }
+
+            // scale y by 0.1 up and down bps times a second.
+            boat.position.y = -3.1 + Math.sin((Time.time * Math.PI * 2) * bps) * 0.1;
+           
+
+
             Input.update();
             gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
             g_cameraController.update();
