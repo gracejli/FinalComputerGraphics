@@ -80,8 +80,8 @@
         // lighting
         var g_lightingData = {
             directionalLight: new V3(-0.2, -0.5, -0.5).normalize(), // light direction
-            directionalColor: new V3(1.0, 1.0, 1.0), // light color by default white
-            ambientColor: new V3(0.2, 0.2, 0.2) // dark gray
+            directionalColor: new V3(1.0, 0.95, 0.8), // light color by default white
+            ambientColor: new V3(0.3, 0.3, 0.3) // dark gray
         }
 
         // This will execute the setup function once the whole document has been loaded.
@@ -118,7 +118,7 @@
             // documentation: https://github.com/goldfire/howler.js#documentation
             music = new Howl({
                 src: ['ressources/road_sounds.mp3'],
-                html5: false// use streaming audio if possible
+                html5: false, // use streaming audio if possible
             });
             music.play();
             music.mute(gui_data.mute);
@@ -196,7 +196,6 @@
 
     
             //LOAD MESHES 
-            let monkeyMesh = OBJLoader.getMesh("monkey", "ressources/monkeyhead.obj");
             let boatMesh = OBJLoader.getMesh("boat", "ressources/boat.obj"); 
         
 
@@ -542,8 +541,6 @@
             pole6.update();
             pole7.update();
 
-            //TPT.update();
-
             let shaderData = { lightingData: g_lightingData};
 
             //DRAWING THE MODEL 
@@ -607,10 +604,9 @@
             g_renderer.drawModel(pole4, g_camera, shaderData);
             g_renderer.drawModel(pole5, g_camera, shaderData);
             g_renderer.drawModel(pole6, g_camera, shaderData);
-	    g_renderer.drawModel(pole7, g_camera, shaderData);
+	        g_renderer.drawModel(pole7, g_camera, shaderData);
 
-            //g_renderer.drawModel(TPT, g_camera, shaderData); 
-
+        
             //g_grid.draw(g_camera);
         }
 
