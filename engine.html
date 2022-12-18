@@ -47,6 +47,7 @@
         var house1, house2, house3, house4, house5, house6;
         var roof1, roof2, roof3, roof4, roof5, roof6;
         var sideRoof6a, sideRoof6b, sideRoof1a, sideRoof1b, sideRoof3;
+	var sideR1L, sideR1R, sideR6L, sideR6R;
         var roofWindow1, roofWindow2, roofWindow3, roofWindow3_1, roofWindow3_2, roofWindow4, roofWindow5, 
         roofWindow6, roofWindow7, roofWindow8, roofWindow9;
         var chimney1, chimney2;
@@ -209,6 +210,11 @@
             sideRoof3 = new ModelTransform(Primitives.TriangularPrism.getMesh(), plasterTextureBlue);
             sideRoof6a = new ModelTransform(Primitives.Cube.getMesh(), plasterTextureGreen);
             sideRoof6b = new ModelTransform(Primitives.TriangularPrism.getMesh(), plasterTextureGreen);
+		
+	    sideR1L = new ModelTransform(Primitives.Quad.getMesh(), tileTexture);
+            sideR1R = new ModelTransform(Primitives.Quad.getMesh(), tileTexture);
+            sideR6L = new ModelTransform(Primitives.Quad.getMesh(), tileTexture);
+            sideR6R = new ModelTransform(Primitives.Quad.getMesh(), tileTexture);
 
             roofWindow1 = new ModelTransform(Primitives.Cube.getMesh(), brickTexture);
             roofWindow2 = new ModelTransform(Primitives.Cube.getMesh(), brickTexture);
@@ -319,6 +325,22 @@
             sideRoof1b.position.set(-12,7.5,-3.29);
             sideRoof1b.rotation.set(0,90,0);
             sideRoof1b.scale.set(1.3,1.45,1.26);
+		
+	    sideR1L.position.set(-12.66,8.2,-3.29);
+            sideR1L.rotation.set(41,90,0);
+            sideR1L.scale.set(2.5,2,1.26);
+
+            sideR1R.position.set(-11.33,8.2,-3.29);
+            sideR1R.rotation.set(-41,90,0);
+            sideR1R.scale.set(2.5,2,1.26);
+
+            sideR6L.position.set(12.66,9.75,-3.25);
+            sideR6L.rotation.set(-27,90,0);
+            sideR6L.scale.set(2.5,2.85,1.26);
+
+            sideR6R.position.set(11.33,9.75,-3.25);
+            sideR6R.rotation.set(27,90,0);
+            sideR6R.scale.set(2.5,2.85,1.26);
 
             roofWindow1.position.set(-14.25,7.75,-3.25);
             roofWindow1.scale.set(1,1,1);
@@ -442,7 +464,11 @@
             sideRoof3.update();
             sideRoof6a.update();
             sideRoof6b.update();
-
+	    sideR1L.update();
+            sideR1R.update();
+            sideR6L.update();
+            sideR6R.update();
+		
             roofWindow1.update();
             roofWindow2.update();
             roofWindow3.update();
@@ -504,6 +530,10 @@
             g_renderer.drawModel(sideRoof3, g_camera, shaderData);
             g_renderer.drawModel(sideRoof6a, g_camera, shaderData);
             g_renderer.drawModel(sideRoof6b, g_camera, shaderData);
+	    g_renderer.drawModel(sideR1L, g_camera, shaderData);
+            g_renderer.drawModel(sideR1R, g_camera, shaderData);
+            g_renderer.drawModel(sideR6L, g_camera, shaderData);
+            g_renderer.drawModel(sideR6R, g_camera, shaderData);
 
             g_renderer.drawModel(roofWindow1, g_camera, shaderData);
             g_renderer.drawModel(roofWindow2, g_camera, shaderData);
